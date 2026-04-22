@@ -41,3 +41,4 @@ If you are using staging, set:
 
 - **Max upload size (v1)**: 4.8 GB. Multipart uploads are not supported.
 - **Share URLs**: `publicUrl` is an app-entry URL that requires exchange; it is not a direct anonymous bytes URL.
+- **Payment headers**: the API accepts `PAYMENT-SIGNATURE` or `x-payment` for x402.

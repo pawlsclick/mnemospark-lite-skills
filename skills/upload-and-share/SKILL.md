@@ -14,7 +14,7 @@ Upload a file through Mnemospark's marketplace-friendly storage API and get a sh
 - A file on disk
 - `tier`: one of `10mb`, `100mb`, `500mb`, `1gb`, `2gb`, `3gb`
 - `contentType`: MIME type
-- x402 payment capability to provide `PAYMENT-SIGNATURE` / `X-PAYMENT` header
+- x402 payment capability to provide `PAYMENT-SIGNATURE` or `x-payment` header
 
 ## Flow (two-step)
 
@@ -36,7 +36,7 @@ Body:
 Headers:
 
 - `Content-Type: application/json`
-- `PAYMENT-SIGNATURE: <x402 payment payload>` (or `X-PAYMENT`)
+- `PAYMENT-SIGNATURE: <x402 payment payload>` (or `x-payment`)
 
 Response:
 

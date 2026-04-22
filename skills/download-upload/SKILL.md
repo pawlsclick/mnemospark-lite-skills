@@ -23,6 +23,5 @@ curl "${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/download/<uploadId>" \
 
 Response includes:
 
-- `data.downloadUrl` (presigned GET)
-- `data.expiresAt`
 - `data.upload` (the upload record)
+- `data.upload.downloadUrl` (optional presigned GET when status is uploaded)

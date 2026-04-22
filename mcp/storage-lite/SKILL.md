@@ -37,7 +37,7 @@ Request body:
 Headers:
 
 - `Content-Type: application/json`
-- `PAYMENT-SIGNATURE: <x402 payment payload>` (or `X-PAYMENT`)
+- `PAYMENT-SIGNATURE: <x402 payment payload>` (or `x-payment`)
 
 Response (important fields):
 
@@ -82,8 +82,7 @@ Header:
 
 Response includes:
 
-- `downloadUrl` (presigned GET)
-- `expiresAt`
+- `upload.downloadUrl` (optional presigned GET when status is uploaded)
 
 ## Constraints
 
