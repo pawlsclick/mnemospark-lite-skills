@@ -1,4 +1,4 @@
-# mnemospark-skills
+# mnemospark-lite-skills
 
 Skills for using Mnemospark's marketplace-friendly storage APIs (mnemospark-lite).
 
