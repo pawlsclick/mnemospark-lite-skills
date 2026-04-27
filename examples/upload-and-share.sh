@@ -29,9 +29,8 @@ upload_id="$(printf '%s' "$create_resp" | jq -r '.data.uploadId')"
 completion_token="$(printf '%s' "$create_resp" | jq -r '.data.completion_token')"
 list_scope_bearer="$(printf '%s' "$create_resp" | jq -r '.data.list_scope_bearer')"
 
-curl -sS -X PUT \
+curl -sS -T "$FILE_PATH" \
   -H "Content-Type: ${CONTENT_TYPE}" \
-  --data-binary @"$FILE_PATH" \
   "$upload_url" >/dev/null
 
 complete_json="$(jq -n \

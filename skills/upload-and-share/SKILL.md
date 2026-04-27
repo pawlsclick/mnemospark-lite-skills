@@ -54,9 +54,8 @@ Send the file bytes to `data.uploadUrl` with `PUT`.
 Example:
 
 ```bash
-curl -X PUT \
+curl -T "example.txt" \
   -H "Content-Type: text/plain" \
-  --data-binary @"example.txt" \
   "<uploadUrl>"
 ```
 
