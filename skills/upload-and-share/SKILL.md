@@ -38,6 +38,13 @@ Headers:
 - `Content-Type: application/json`
 - `PAYMENT-SIGNATURE: <x402 payment payload>` (or `x-payment`)
 
+Notes:
+
+- This endpoint uses the **`exact` (default)** payment scheme: the client pays the exact advertised price.
+- If you call it **without payment**, it returns **`402 Payment Required`** and includes a base64-encoded
+  `PAYMENT-REQUIRED` challenge header. Bazaar discovery may probe with **no body**, so the endpoint still
+  responds with `402` in that case (not `400`).
+
 Response:
 
 - `data.uploadId`
