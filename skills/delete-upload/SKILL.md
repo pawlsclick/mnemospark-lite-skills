@@ -1,6 +1,6 @@
 # delete-upload (mnemospark-lite)
 
-Delete one or more uploads by upload ID.
+Delete one or more uploads by upload ID via the mnemospark-lite HTTP API.
 
 ## Endpoint used
 
@@ -9,7 +9,7 @@ Delete one or more uploads by upload ID.
 ## Inputs you need
 
 - `MNEMOSPARK_API_BASE_URL`
-- `Authorization: Bearer <token>` (use `list_scope_bearer` returned from the paid upload call)
+- `Authorization: Bearer <token>` (typically `list_scope_bearer` from the paid upload flow)
 - One or more `uploadId` values
 
 ## Request
@@ -28,5 +28,7 @@ Response includes:
 - `data.deleted` (count)
 - `data.results[]` per upload ID
 
-After deleting, re-run `GET /api/mnemospark-lite/uploads` to confirm the items are gone.
+## Notes
 
+- Deletes are wallet-scoped; each ID is processed independently in `data.results[]`.
+- Re-run `GET /api/mnemospark-lite/uploads` to confirm removals.

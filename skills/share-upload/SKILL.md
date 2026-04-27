@@ -1,6 +1,6 @@
 # share-upload (mnemospark-lite)
 
-Mint a **24-hour** share URL for a specific upload ID.
+Mint a **24-hour** share URL for a specific upload ID via the mnemospark-lite HTTP API.
 
 ## Endpoint used
 
@@ -9,7 +9,7 @@ Mint a **24-hour** share URL for a specific upload ID.
 ## Inputs you need
 
 - `MNEMOSPARK_API_BASE_URL`
-- `Authorization: Bearer <token>` (use `list_scope_bearer` returned from the paid upload call)
+- `Authorization: Bearer <token>` (typically `list_scope_bearer` from the paid upload flow)
 - `uploadId`
 
 ## Request
@@ -25,6 +25,10 @@ curl "${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/share" \
 
 Response includes:
 
-- `data.shareUrl` like `https://app.mnemospark.ai/mnemospark-lite/?share=...`
-- `data.expiresAt` (24 hours)
+- `data.shareUrl` (e.g. `https://app.mnemospark.ai/mnemospark-lite/?share=...`)
+- `data.expiresAt` (24 hours from mint)
 
+## Notes
+
+- Bearer access is wallet-scoped to the same payer scope as list/download.
+- The share URL is anonymous and expires after 24 hours; recipients use the app flow to exchange the token for a short-lived download URL.

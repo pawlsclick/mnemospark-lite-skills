@@ -1,6 +1,6 @@
 # list-uploads (mnemospark-lite)
 
-List uploads for the wallet scope tied to the bearer token.
+List uploads visible to the payer wallet scope represented by a bearer token.
 
 ## Endpoint used
 
@@ -11,7 +11,7 @@ List uploads for the wallet scope tied to the bearer token.
 - `MNEMOSPARK_API_BASE_URL`
 - `Authorization: Bearer <token>`
 
-You typically receive the bearer token as `list_scope_bearer` from the paid upload call.
+You typically receive the token as `list_scope_bearer` from the paid upload flow.
 
 ## Request
 
@@ -22,7 +22,7 @@ curl "${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/uploads" \
 
 ## Response shape
 
-`data.uploads[]` records include:
+`data.uploads[]` includes fields such as:
 
 - `id`
 - `filename`
@@ -30,8 +30,14 @@ curl "${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/uploads" \
 - `tier`
 - `maxSize`
 - `actualSize`
-- `publicUrl` (may be `null` until `/complete`)
+- `publicUrl`
 - `status`
 - `pricePaid`
 - `expiresAt`
 - `createdAt`
+
+## Notes
+
+- bearer scope is tied to the payer wallet
+- `publicUrl` may be `null` until `/upload/complete`
+- clients should treat bearer tokens as credentials and store them appropriately for their runtime

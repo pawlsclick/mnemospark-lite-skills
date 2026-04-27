@@ -1,44 +1,53 @@
 # mnemospark-lite-skills
 
-Skills for using Mnemospark's marketplace-friendly storage APIs (mnemospark-lite).
+Framework-neutral usage docs and adapters for **mnemospark-lite**, a marketplace-friendly storage API powered by **x402**.
 
-These skills are designed so any agent can:
+## What mnemospark-lite is
 
-- pay for an upload slot (x402)
-- upload bytes via presigned PUT
-- mint a share URL (`https://app.mnemospark.ai/?code=...`) via `/complete`
-- list and download uploads via bearer-scoped read APIs
+mnemospark-lite is a paid HTTP storage workflow that any agent or client can call without API keys or account setup.
 
-## Installation
+Core flow:
 
-This repository provides two parallel formats:
+1. `POST /api/mnemospark-lite/upload` with x402 payment
+2. `PUT` file bytes to the returned presigned `uploadUrl`
+3. `POST /api/mnemospark-lite/upload/complete`
+4. Use bearer-scoped read APIs for listing and download
 
-- `skills/`: CLI / prompt-mode skills (copy/paste-friendly instructions)
-- `mcp/`: MCP-mode skills (tool-oriented wrappers / docs)
+Core endpoints:
 
-## Available skills (v1)
+- `POST /api/mnemospark-lite/upload`
+- `POST /api/mnemospark-lite/upload/complete`
+- `GET /api/mnemospark-lite/uploads`
+- `GET /api/mnemospark-lite/download/{uploadId}`
 
-- `upload-and-share`
-  - `POST /api/mnemospark-lite/upload` (x402)
-  - `PUT` bytes to `uploadUrl`
-  - `POST /api/mnemospark-lite/upload/complete`
-- `list-uploads`
-  - `GET /api/mnemospark-lite/uploads` (bearer)
-- `download-upload`
-  - `GET /api/mnemospark-lite/download/{uploadId}` (bearer)
+## Design goals
 
-## Quick start (API base URL)
+- **Framework-neutral**: usable from any agent framework or ordinary HTTP client
+- **Marketplace-native**: standard x402 payment flow over HTTP
+- **No plugin dependency**: no OpenClaw plugin or dedicated mnemospark agent required
+- **Thin adapters only**: OpenClaw, MCP, CLI, and other wrappers are optional layers on top of the HTTP API
 
-Set your API base URL (examples below assume):
+## Repository layout
+
+- `skills/` — framework-neutral workflow docs
+- `mcp/` — MCP-oriented wrappers/docs
+- `examples/` — generic HTTP and curl examples
+- `adapters/` — framework-specific guidance (OpenClaw, etc.) if needed
+
+## Quick start
+
+Set:
 
 - `MNEMOSPARK_API_BASE_URL=https://api.mnemospark.ai`
 
-If you are using staging, set:
+Staging:
 
 - `MNEMOSPARK_API_BASE_URL=https://api-staging.mnemospark.ai`
 
 ## Notes
 
-- **Max upload size (v1)**: 4.8 GB. Multipart uploads are not supported.
-- **Share URLs**: `publicUrl` is an app-entry URL that requires exchange; it is not a direct anonymous bytes URL.
-- **Payment headers**: the API accepts `PAYMENT-SIGNATURE` or `x-payment` for x402.
+- **Max upload size (v1):** 4.8 GB
+- **Multipart uploads:** not supported in v1
+- **Share URLs:** `publicUrl` is an app-entry URL such as `https://app.mnemospark.ai/?code=...`; it is not a direct anonymous bytes URL
+- **Payment:** x402 via `PAYMENT-SIGNATURE` or `x-payment`
+- **Read APIs:** bearer-scoped to the payer wallet returned by the paid upload flow
