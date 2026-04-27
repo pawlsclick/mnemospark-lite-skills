@@ -44,6 +44,10 @@ Notes:
 - If you call it **without payment**, it returns **`402 Payment Required`** and includes a base64-encoded
   `PAYMENT-REQUIRED` challenge header. Bazaar discovery may probe with **no body**, so the endpoint still
   responds with `402` in that case (not `400`).
+- Pricing is **tier-based** and is computed from the selected tier’s **max size** (not necessarily your exact `size_bytes`).
+  To ensure you pay the correct amount:
+  - First call `/api/mnemospark-lite/upload` **without payment** but **with a JSON body including `tier`**.
+  - Read `PAYMENT-REQUIRED` → `accepts[0].amount` and pay that exact amount using `PAYMENT-SIGNATURE` / `x-payment`.
 
 Response:
 
