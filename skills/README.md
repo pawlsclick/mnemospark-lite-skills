@@ -7,3 +7,5 @@ Each folder contains a `SKILL.md` you can copy/paste into any agent as operating
 - `upload-and-share/`
 - `list-uploads/`
 - `download-upload/`
+- `share-upload/`
+- `delete-upload/`
