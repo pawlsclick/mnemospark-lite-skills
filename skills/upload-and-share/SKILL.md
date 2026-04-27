@@ -1,24 +1,24 @@
 # upload-and-share (mnemospark-lite)
 
-Upload a file through Mnemospark's marketplace-friendly storage API and get a share URL.
+Upload a file through the mnemospark-lite HTTP API and mint a share URL.
 
 ## Endpoints used
 
 - `POST /api/mnemospark-lite/upload` (x402 paid)
-- `PUT` to `data.uploadUrl` (presigned S3 PUT)
-- `POST /api/mnemospark-lite/upload/complete` (free; completion token)
+- `PUT` to `data.uploadUrl` (presigned object upload)
+- `POST /api/mnemospark-lite/upload/complete` (completion token)
 
 ## Inputs you need
 
-- `MNEMOSPARK_API_BASE_URL`: e.g. `https://api.mnemospark.ai` (or staging)
-- A file on disk
+- `MNEMOSPARK_API_BASE_URL`
+- a file on disk
 - `tier`: one of `10mb`, `100mb`, `500mb`, `1gb`, `2gb`, `3gb`
-- `contentType`: MIME type
-- x402 payment capability to provide `PAYMENT-SIGNATURE` or `x-payment` header
+- `contentType`
+- an x402-capable payer that can send `PAYMENT-SIGNATURE` or `x-payment`
 
-## Flow (two-step)
+## Canonical flow
 
-### 1) Create paid upload slot
+### 1) Request a paid upload slot
 
 `POST ${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/upload`
 
@@ -36,38 +36,31 @@ Body:
 Headers:
 
 - `Content-Type: application/json`
-- `PAYMENT-SIGNATURE: <x402 payment payload>` (or `x-payment`)
+- `PAYMENT-SIGNATURE: <payment>` or `x-payment: <payment>`
 
-Notes:
-
-- This endpoint uses the **`exact` (default)** payment scheme: the client pays the exact advertised price.
-- If you call it **without payment**, it returns **`402 Payment Required`** and includes a base64-encoded
-  `PAYMENT-REQUIRED` challenge header. Bazaar discovery may probe with **no body**, so the endpoint still
-  responds with `402` in that case (not `400`).
-- Pricing is **tier-based** and is computed from the selected tier’s **max size** (not necessarily your exact `size_bytes`).
-  To ensure you pay the correct amount:
-  - First call `/api/mnemospark-lite/upload` **without payment** but **with a JSON body including `tier`**.
-  - Read `PAYMENT-REQUIRED` → `accepts[0].amount` and pay that exact amount using `PAYMENT-SIGNATURE` / `x-payment`.
-
-Response:
+Response fields include:
 
 - `data.uploadId`
 - `data.uploadUrl`
 - `data.completion_token`
 - `data.list_scope_bearer`
-- `data.publicUrl` is `null` (minted after `/complete`)
+- `data.publicUrl` = `null` before completion
+- `data.siteUrl` = `null` before completion
 
-### 2) PUT bytes to S3
+### 2) Upload bytes
 
-Use `data.uploadUrl`:
+Send the file bytes to `data.uploadUrl` with `PUT`.
+
+Example:
 
 ```bash
-curl --data-binary @"example.txt" \
+curl -X PUT \
   -H "Content-Type: text/plain" \
+  --data-binary @"example.txt" \
   "<uploadUrl>"
 ```
 
-### 3) Complete (reconcile + mint share URL)
+### 3) Complete and mint the share URL
 
 `POST ${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/upload/complete`
 
@@ -78,11 +71,23 @@ curl --data-binary @"example.txt" \
 }
 ```
 
-Response contains:
+Response includes:
 
-- `data.upload.publicUrl` (and `siteUrl` via the same string) as `https://app.mnemospark.ai/?code=...`
-- `data.upload.status = "uploaded"`
+- `data.upload.publicUrl`
+- `data.upload.siteUrl`
+- `data.upload.status`
 
-## Error behavior
+## Payment behavior
 
-- Files larger than **4.8 GB** return a clear 4xx error (multipart is not supported in v1).
+- The upload call is the paid x402 entrypoint
+- A client may first probe without payment to receive the `402 Payment Required` challenge
+- The client should then pay the advertised amount and retry the same request
+
+## Output expectations
+
+Return or persist for the active task:
+
+- `uploadId`
+- `publicUrl`
+- `siteUrl`
+- `list_scope_bearer`

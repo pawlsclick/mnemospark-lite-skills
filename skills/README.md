@@ -1,6 +1,6 @@
-# Mnemospark skills (CLI / prompt-mode)
+# mnemospark skills (CLI / prompt-mode)
 
-Each folder contains a `SKILL.md` you can copy/paste into any agent as operating instructions.
+Framework-neutral workflow docs: each folder has a `SKILL.md` you can copy into any agent as operating instructions.
 
 ## Skills
 

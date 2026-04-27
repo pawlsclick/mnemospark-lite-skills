@@ -1,12 +1,7 @@
-# Mnemospark skills (MCP-mode)
+# mnemospark-lite MCP adapter
 
-This folder contains MCP-friendly skills and guidance for calling Mnemospark's marketplace storage APIs.
+MCP-oriented wrappers and docs for mnemospark-lite. The HTTP API described in `skills/` is the source of truth; this folder shows how to expose it as MCP tools.
 
-If your agent runtime supports MCP tools, you can implement a thin tool wrapper that:
+If your agent runtime supports MCP tools, you can implement thin tool wrappers that call the same endpoints as the framework-neutral skills.
 
-- calls `POST /api/mnemospark-lite/upload` with x402 payment headers
-- performs `PUT` bytes to the returned presigned `uploadUrl`
-- calls `POST /api/mnemospark-lite/upload/complete` with `completion_token`
-- uses the returned bearer token for `GET /uploads` and `GET /download/{uploadId}`
-
-See `mcp/storage-lite/SKILL.md` for the full contract.
+See `mcp/storage-lite/SKILL.md` for the full tool contract.
