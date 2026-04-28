@@ -24,17 +24,39 @@ create_json="$(jq -n \
   --argjson size_bytes "$size_bytes" \
   '{filename:$filename, contentType:$contentType, tier:$tier, size_bytes:$size_bytes}')"
 
-create_resp="$(curl -sS \
-  -X POST "${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/upload" \
-  -H "Accept: application/json" \
-  -H "Content-Type: application/json" \
-  -H "${PAYMENT_HEADER}: ${PAYMENT_VALUE}" \
-  -d "$create_json")"
+create_deadline=$((SECONDS + 60))
+create_resp=''
+while :; do
+  create_resp_with_status="$(curl -sS \
+    -w $'\n%{http_code}' \
+    -X POST "${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/upload" \
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    -H "${PAYMENT_HEADER}: ${PAYMENT_VALUE}" \
+    -d "$create_json")"
+  create_http_status="${create_resp_with_status##*$'\n'}"
+  create_resp="${create_resp_with_status%$'\n'*}"
+
+  if [[ "$create_http_status" == "200" ]]; then
+    break
+  fi
+  if [[ "$create_http_status" != "202" ]]; then
+    echo "Create upload slot failed: status=$create_http_status body=$create_resp" >&2
+    exit 1
+  fi
+  if (( SECONDS >= create_deadline )); then
+    echo "Timed out waiting for paid /upload to settle" >&2
+    exit 1
+  fi
+  sleep 2
+done
 
 upload_url="$(printf '%s' "$create_resp" | jq -r '.data.uploadUrl')"
 upload_id="$(printf '%s' "$create_resp" | jq -r '.data.uploadId')"
 completion_token="$(printf '%s' "$create_resp" | jq -r '.data.completion_token')"
 list_scope_bearer="$(printf '%s' "$create_resp" | jq -r '.data.list_scope_bearer')"
+payment_status="$(printf '%s' "$create_resp" | jq -r '.metadata.payment.status // empty')"
+payment_tx_hash="$(printf '%s' "$create_resp" | jq -r '.metadata.payment.transactionHash // empty')"
 
 curl -sS -T "$FILE_PATH" \
   -H "Content-Type: ${CONTENT_TYPE}" \
@@ -81,4 +103,6 @@ jq -n \
   --arg bearer "$list_scope_bearer" \
   --arg publicUrl "$(printf '%s' "$complete_resp" | jq -r '.data.upload.publicUrl')" \
   --arg siteUrl "$(printf '%s' "$complete_resp" | jq -r '.data.upload.siteUrl')" \
-  '{uploadId:$uploadId, publicUrl:$publicUrl, siteUrl:$siteUrl, list_scope_bearer:$bearer}'
+  --arg uploadPaymentStatus "$payment_status" \
+  --arg uploadPaymentTransactionHash "$payment_tx_hash" \
+  '{uploadId:$uploadId, publicUrl:$publicUrl, siteUrl:$siteUrl, list_scope_bearer:$bearer, upload_payment_status:$uploadPaymentStatus, upload_payment_transaction_hash:$uploadPaymentTransactionHash}'

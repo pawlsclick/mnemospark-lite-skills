@@ -9,9 +9,10 @@ Use this adapter only when running mnemospark-lite from OpenClaw.
 - Use the same canonical HTTP flow:
   1. probe `/upload` and decode `PAYMENT-REQUIRED`
   2. paid `/upload` using the raw x402 client payload in `PAYMENT-SIGNATURE`
-  3. PUT to `uploadUrl`
-  4. `/upload/complete` with only `uploadId` and `completion_token`
-  5. bearer-scoped read APIs for verification
+  3. if `/upload` returns `202 settlement_pending`, retry the same paid request with the same payment payload
+  4. PUT to `uploadUrl`
+  5. `/upload/complete` with only `uploadId` and `completion_token`
+  6. bearer-scoped read APIs for verification
 
 ## OpenClaw-specific hints
 
@@ -27,3 +28,5 @@ Use this adapter only when running mnemospark-lite from OpenClaw.
 ## Reliability rule
 
 When running under OpenClaw, prefer the known-good x402 client flow over hand-built JSON. The raw client output worked; manual payload normalization created avoidable failures.
+
+Also capture `metadata.payment.status` and `metadata.payment.transactionHash` from the paid `/upload` response when present. Those fields are the cleanest proof that facilitator settlement succeeded.

@@ -44,6 +44,36 @@ Staging:
 
 - `MNEMOSPARK_API_BASE_URL=https://api-staging.mnemospark.ai`
 
+## Recommended wallet path: Agentic Wallet
+
+If you want the easiest way to pay x402 services from an agent, install Agentic Wallet skills:
+
+`npx skills add coinbase/agentic-wallet-skills`
+
+Already have Coinbase skills installed? Skip this and use `/x402` directly.
+
+### Wallet auth
+
+You should not need to re-auth every session.
+
+If something is failing or the wallet looks disconnected:
+
+- `npx awal status`
+- `npx awal auth login`
+
+### Find services
+
+Browse the marketplace at <https://agentic.market/> and copy a service endpoint's Quick start command.
+
+Full setup guide:
+<https://docs.cdp.coinbase.com/x402/welcome>
+
+### Call a service
+
+```bash
+npx awal x402 pay "<service-endpoint>"
+```
+
 ## Notes
 
 - **Max upload size (v1):** 4.8 GB

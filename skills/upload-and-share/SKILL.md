@@ -46,6 +46,9 @@ Response fields include:
 - `data.list_scope_bearer`
 - `data.publicUrl` = `null` before completion
 - `data.siteUrl` = `null` before completion
+- `metadata.payment.status` when available
+- `metadata.payment.transactionHash` when available
+- `metadata.payment.success` when available
 
 ### 2) Upload bytes
 
@@ -95,7 +98,7 @@ Do **not**:
 - inject or remove fields unless you are explicitly debugging a backend compatibility problem
 - rebuild a smaller payload by hand when the x402 client already returned the full object
 
-A known-good production flow used the raw x402 client payload for the paid `/upload` request, then called `/upload/complete` with only `uploadId` and `completion_token`.
+A known-good production flow used the raw x402 client payload for the paid `/upload` request, retried the same paid request on `202 settlement_pending` with the same payment payload, then called `/upload/complete` with only `uploadId` and `completion_token`.
 
 ## Critical payment compatibility note
 
@@ -151,12 +154,29 @@ Example shape:
 
 Some backends may normalize or enrich stored payment fields later during settlement. Treat that as a server concern, not a reason to mutate or shrink the client payload during the paid upload request.
 
+## Settlement behavior
+
+- The paid `POST /upload` call may return `200` immediately or `202` with `error: settlement_pending`.
+- If `/upload` returns `202`, retry the same paid request.
+- Reuse the exact same `PAYMENT-SIGNATURE` or `x-payment` value while polling.
+- Do **not** regenerate, normalize, or shrink the payment payload between retries.
+- Poll about every 2 seconds.
+- A practical timeout of about 60 seconds worked in testing.
+
+Capture settlement fields from the paid `/upload` response when present:
+
+- `metadata.payment.status`
+- `metadata.payment.transactionHash`
+- `metadata.payment.success`
+
+These fields provide useful audit evidence that the facilitator settlement completed.
+
 ## Completion behavior
 
 - `POST /upload/complete` does **not** need a payment header.
 - Send only `uploadId` and `completion_token`.
 - If the service returns `202`, poll every few seconds until you receive `200` or hit your timeout.
-- A practical timeout of about 45 seconds worked in testing.
+- A practical timeout of about 45–60 seconds worked in testing.
 
 ## Verification behavior
 
@@ -180,3 +200,5 @@ Return or persist for the active task:
 - `publicUrl`
 - `siteUrl`
 - `list_scope_bearer`
+- `metadata.payment.status` when present
+- `metadata.payment.transactionHash` when present
