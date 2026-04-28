@@ -93,9 +93,15 @@ Do **not**:
 - rewrite the payload into a different version
 - convert `eip155:8453` into `base`
 - inject or remove fields unless you are explicitly debugging a backend compatibility problem
-- rebuild the `accepted` object by hand if the x402 client already returned it
+- rebuild a smaller payload by hand when the x402 client already returned the full object
 
 A known-good production flow used the raw x402 client payload for the paid `/upload` request, then called `/upload/complete` with only `uploadId` and `completion_token`.
+
+## Critical payment compatibility note
+
+In production and staging testing, a hand-built payment payload that included `scheme` and `network` but omitted the full `accepted` object allowed `/upload` and the S3 `PUT` to succeed, but `/upload/complete` later failed during CDP settlement with an invalid `paymentPayload` error.
+
+Agents should therefore preserve and send the x402 client-generated payload verbatim, including the full `accepted` object from the 402 challenge.
 
 ### Expected x402 v2 payload shape
 
@@ -143,7 +149,7 @@ Example shape:
 }
 ```
 
-Some backends may normalize or enrich stored payment fields later during settlement. Treat that as a server concern, not a reason to mutate the client payload during the paid upload request.
+Some backends may normalize or enrich stored payment fields later during settlement. Treat that as a server concern, not a reason to mutate or shrink the client payload during the paid upload request.
 
 ## Completion behavior
 

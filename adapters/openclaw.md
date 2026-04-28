@@ -15,10 +15,12 @@ Use this adapter only when running mnemospark-lite from OpenClaw.
 
 ## OpenClaw-specific hints
 
-- If the mnemospark plugin is installed, the wallet key may already exist at a path like `/home/ubuntu/.openclaw/blockrun/wallet.key`.
+- If the mnemospark plugin is installed, the wallet key usually exists at:
+  - `/home/ubuntu/.openclaw/mnemospark/wallet/wallet.key`
+- Some older or local setups may also have a legacy Blockrun wallet path, but do not assume it is the active mnemospark wallet.
 - For the plugin CLI, prefer an absolute invocation like:
   - `/usr/bin/node /home/ubuntu/.openclaw/extensions/mnemospark/dist/cli.js wallet`
-- Do not rely on `npx mnemospark` or cwd-sensitive paths when the local install state may have drifted.
+- Do not rely on `npx mnemospark` or cwd-sensitive paths when local install state may have drifted.
 - If you use the Python x402 client path, install the EVM extras, not only the base package:
   - `pip install 'x402[evm]'`
 
