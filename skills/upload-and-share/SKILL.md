@@ -78,9 +78,54 @@ Response includes:
 
 ## Payment behavior
 
-- The upload call is the paid x402 entrypoint
-- A client may first probe without payment to receive the `402 Payment Required` challenge
-- The client should then pay the advertised amount and retry the same request
+- The upload call is the paid x402 entrypoint.
+- A client may first probe without payment to receive the `402 Payment Required` challenge.
+- Read `PAYMENT-REQUIRED` or `x-payment-required`, base64-decode it, and preserve the advertised payment requirement.
+- The retry request should send `PAYMENT-SIGNATURE: <base64-json>` or `x-payment: <base64-json>`.
+
+For x402 v2, the payment payload sent back to mnemospark-lite must include:
+
+- `x402Version`
+- `scheme`
+- `network`
+- `accepted`
+- `payload.signature`
+- `payload.authorization`
+
+Important: include the full `accepted` object from the 402 challenge, not only `scheme`/`network`.
+
+Minimal shape:
+
+```json
+{
+  "x402Version": 2,
+  "scheme": "exact",
+  "network": "eip155:8453",
+  "accepted": {
+    "scheme": "exact",
+    "network": "eip155:8453",
+    "asset": "<asset>",
+    "payTo": "<recipient>",
+    "amount": "<amount>",
+    "maxTimeoutSeconds": 3600,
+    "extra": {
+      "name": "USD Coin",
+      "version": "2"
+    }
+  },
+  "payload": {
+    "signature": "<eip3009-signature>",
+    "authorization": {
+      "from": "<payer-wallet>",
+      "to": "<recipient>",
+      "value": "<amount>",
+      "validAfter": "<unix-seconds>",
+      "validBefore": "<unix-seconds>",
+      "nonce": "<bytes32>"
+    }
+  }
+}
+```
 
 ## Output expectations
 
