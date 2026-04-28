@@ -56,6 +56,14 @@ def _http_json(
         return exc.code, dict(exc.headers.items()), parsed
 
 
+def _get_header_case_insensitive(headers: dict[str, str], name: str) -> str | None:
+    target = name.casefold()
+    for key, value in headers.items():
+        if key.casefold() == target:
+            return value
+    return None
+
+
 def _http_put_bytes(url: str, *, content_type: str, data: bytes):
     req = urllib_request.Request(url, data=data, method="PUT")
     req.add_header("Content-Type", content_type)
@@ -104,7 +112,7 @@ def main() -> int:
     if status != 402:
         raise SystemExit(f"Expected 402 for missing payment, got {status}")
 
-    payment_required_b64 = resp_headers.get("PAYMENT-REQUIRED") or resp_headers.get("Payment-Required")
+    payment_required_b64 = _get_header_case_insensitive(resp_headers, "PAYMENT-REQUIRED")
     if not payment_required_b64:
         raise SystemExit("Missing PAYMENT-REQUIRED header on 402 response")
 
@@ -141,7 +149,7 @@ def main() -> int:
     payment_payload = x402_client.create_payment_payload(payment_required)
 
     payment_sig_value = base64.b64encode(
-        json.dumps(payment_payload.model_dump(), separators=(",", ":")).encode("utf-8")
+        json.dumps(payment_payload.model_dump(by_alias=True), separators=(",", ":")).encode("utf-8")
     ).decode("ascii")
 
     status, _, paid_resp = _http_json(
