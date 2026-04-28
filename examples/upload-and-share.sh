@@ -57,6 +57,7 @@ completion_token="$(printf '%s' "$create_resp" | jq -r '.data.completion_token')
 list_scope_bearer="$(printf '%s' "$create_resp" | jq -r '.data.list_scope_bearer')"
 payment_status="$(printf '%s' "$create_resp" | jq -r '.metadata.payment.status // empty')"
 payment_tx_hash="$(printf '%s' "$create_resp" | jq -r '.metadata.payment.transactionHash // empty')"
+payment_success="$(printf '%s' "$create_resp" | jq -r '.metadata.payment.success // empty')"
 
 curl -sS -T "$FILE_PATH" \
   -H "Content-Type: ${CONTENT_TYPE}" \
@@ -105,4 +106,5 @@ jq -n \
   --arg siteUrl "$(printf '%s' "$complete_resp" | jq -r '.data.upload.siteUrl')" \
   --arg uploadPaymentStatus "$payment_status" \
   --arg uploadPaymentTransactionHash "$payment_tx_hash" \
-  '{uploadId:$uploadId, publicUrl:$publicUrl, siteUrl:$siteUrl, list_scope_bearer:$bearer, upload_payment_status:$uploadPaymentStatus, upload_payment_transaction_hash:$uploadPaymentTransactionHash}'
+  --arg uploadPaymentSuccess "$payment_success" \
+  '{uploadId:$uploadId, publicUrl:$publicUrl, siteUrl:$siteUrl, list_scope_bearer:$bearer, upload_payment_status:$uploadPaymentStatus, upload_payment_transactionHash:$uploadPaymentTransactionHash, upload_payment_success:$uploadPaymentSuccess}'
