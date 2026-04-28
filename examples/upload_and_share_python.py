@@ -152,16 +152,29 @@ def main() -> int:
         json.dumps(payment_payload.model_dump(by_alias=True), separators=(",", ":")).encode("utf-8")
     ).decode("ascii")
 
-    status, _, paid_resp = _http_json(
-        "POST",
-        upload_endpoint,
-        body={"filename": filename, "contentType": content_type, "tier": tier, "size_bytes": int(size_bytes)},
-        headers={"PAYMENT-SIGNATURE": payment_sig_value},
-    )
-    if status != 200 or not isinstance(paid_resp, dict) or not paid_resp.get("success"):
+    paid_resp = None
+    started = time.time()
+    while True:
+        status, _, paid_resp = _http_json(
+            "POST",
+            upload_endpoint,
+            body={"filename": filename, "contentType": content_type, "tier": tier, "size_bytes": int(size_bytes)},
+            headers={"PAYMENT-SIGNATURE": payment_sig_value},
+        )
+        if status == 200 and isinstance(paid_resp, dict) and paid_resp.get("success"):
+            break
+        if status == 202:
+            if time.time() - started > 60:
+                raise SystemExit(f"Paid upload slot still pending after 60s: status={status} body={paid_resp}")
+            time.sleep(2)
+            continue
         raise SystemExit(f"Paid upload slot failed: status={status} body={paid_resp}")
 
     data = paid_resp.get("data") or {}
+    metadata = paid_resp.get("metadata") or {}
+    payment_meta = metadata.get("payment") if isinstance(metadata, dict) else {}
+    if not isinstance(payment_meta, dict):
+        payment_meta = {}
     upload_id = data.get("uploadId")
     presigned_put = data.get("uploadUrl")
     completion_token = data.get("completion_token")
@@ -210,7 +223,19 @@ def main() -> int:
     detail_upload = (detail_resp.get("data") or {}).get("upload") if isinstance(detail_resp, dict) else None
     download_url = detail_upload.get("downloadUrl") if isinstance(detail_upload, dict) else None
 
-    print(json.dumps({"uploadId": upload_id, "publicUrl": public_url, "downloadUrl": download_url}, indent=2))
+    print(
+        json.dumps(
+            {
+                "uploadId": upload_id,
+                "publicUrl": public_url,
+                "downloadUrl": download_url,
+                "upload_payment_status": payment_meta.get("status"),
+                "upload_payment_transactionHash": payment_meta.get("transactionHash"),
+                "upload_payment_success": payment_meta.get("success"),
+            },
+            indent=2,
+        )
+    )
     return 0
 
 
