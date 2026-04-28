@@ -59,8 +59,11 @@ def _http_json(
 def _http_put_bytes(url: str, *, content_type: str, data: bytes):
     req = urllib_request.Request(url, data=data, method="PUT")
     req.add_header("Content-Type", content_type)
-    with urllib_request.urlopen(req, timeout=60) as resp:
-        return resp.status, dict(resp.headers.items())
+    try:
+        with urllib_request.urlopen(req, timeout=60) as resp:
+            return resp.status, dict(resp.headers.items())
+    except HTTPError as exc:
+        return exc.code, dict(exc.headers.items())
 
 
 def main() -> int:
