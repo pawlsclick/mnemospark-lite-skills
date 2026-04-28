@@ -4,10 +4,24 @@ Use this adapter only when running mnemospark-lite from OpenClaw.
 
 ## Notes
 
-- OpenClaw installs with the mnemospark plugin may already have a funded mnemospark-compatible wallet on disk
-- framework-specific secret paths and runtime behavior belong here, not in the core API workflow docs
-- use the same canonical HTTP flow:
-  1. paid `/upload`
-  2. PUT to `uploadUrl`
-  3. `/upload/complete`
-  4. bearer-scoped read APIs
+- OpenClaw installs with the mnemospark plugin may already have a funded mnemospark-compatible wallet on disk.
+- Framework-specific secret paths and runtime behavior belong here, not in the core API workflow docs.
+- Use the same canonical HTTP flow:
+  1. probe `/upload` and decode `PAYMENT-REQUIRED`
+  2. paid `/upload` using the raw x402 client payload in `PAYMENT-SIGNATURE`
+  3. PUT to `uploadUrl`
+  4. `/upload/complete` with only `uploadId` and `completion_token`
+  5. bearer-scoped read APIs for verification
+
+## OpenClaw-specific hints
+
+- If the mnemospark plugin is installed, the wallet key may already exist at a path like `/home/ubuntu/.openclaw/blockrun/wallet.key`.
+- For the plugin CLI, prefer an absolute invocation like:
+  - `/usr/bin/node /home/ubuntu/.openclaw/extensions/mnemospark/dist/cli.js wallet`
+- Do not rely on `npx mnemospark` or cwd-sensitive paths when the local install state may have drifted.
+- If you use the Python x402 client path, install the EVM extras, not only the base package:
+  - `pip install 'x402[evm]'`
+
+## Reliability rule
+
+When running under OpenClaw, prefer the known-good x402 client flow over hand-built JSON. The raw client output worked; manual payload normalization created avoidable failures.
