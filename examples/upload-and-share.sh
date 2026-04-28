@@ -48,16 +48,26 @@ complete_json="$(jq -n \
 deadline=$((SECONDS + 45))
 complete_resp=''
 while :; do
-  complete_resp="$(curl -sS \
+  complete_resp_with_status="$(curl -sS \
+    -w $'\n%{http_code}' \
     -X POST "${MNEMOSPARK_API_BASE_URL}/api/mnemospark-lite/upload/complete" \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -d "$complete_json")"
+  complete_http_status="${complete_resp_with_status##*$'\n'}"
+  complete_resp="${complete_resp_with_status%$'\n'*}"
 
-  status="$(printf '%s' "$complete_resp" | jq -r '.data.upload.status // empty')"
-  public_url="$(printf '%s' "$complete_resp" | jq -r '.data.upload.publicUrl // empty')"
-  if [[ -n "$public_url" ]]; then
-    break
+  if [[ "$complete_http_status" == "200" ]]; then
+    public_url="$(printf '%s' "$complete_resp" | jq -r '.data.upload.publicUrl // empty')"
+    if [[ -n "$public_url" ]]; then
+      break
+    fi
+    echo "Complete response missing publicUrl: body=$complete_resp" >&2
+    exit 1
+  fi
+  if [[ "$complete_http_status" != "202" ]]; then
+    echo "Complete failed: status=$complete_http_status body=$complete_resp" >&2
+    exit 1
   fi
   if (( SECONDS >= deadline )); then
     echo "Timed out waiting for /upload/complete to mint a URL" >&2
