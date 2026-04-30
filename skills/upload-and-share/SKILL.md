@@ -83,9 +83,11 @@ Response includes:
 
 - The upload call is the paid x402 entrypoint.
 - A client may first probe without payment to receive the `402 Payment Required` challenge.
+- The `402` JSON body includes `resource.url`, `accepts`, and `extensions.bazaar` discovery info (per bazaar spec: `https://raw.githubusercontent.com/x402-foundation/x402/refs/heads/main/specs/extensions/bazaar.md`).
 - Read `PAYMENT-REQUIRED` or `x-payment-required`, base64-decode it, and preserve the advertised payment requirement.
 - The retry request should send `PAYMENT-SIGNATURE: <base64-json>` or `x-payment: <base64-json>`.
 - Prefer `PAYMENT-SIGNATURE` unless a framework only supports `x-payment`.
+- Best practice for bazaar indexing: echo the `extensions.bazaar` object from the `402` response into the x402 `PaymentPayload` you generate and submit for settlement.
 
 ### Critical rule: send the x402 client output verbatim
 

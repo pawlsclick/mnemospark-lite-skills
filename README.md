@@ -80,4 +80,5 @@ npx awal x402 pay "<service-endpoint>"
 - **Multipart uploads:** not supported in v1
 - **Share URLs:** `publicUrl` is an app-entry URL such as `https://app.mnemospark.ai/?code=...`; it is not a direct anonymous bytes URL
 - **Payment:** x402 via `PAYMENT-SIGNATURE` or `x-payment`
+- **Bazaar discovery:** the initial `402` response includes `extensions.bazaar` in the JSON body (as well as `PAYMENT-REQUIRED` / `x-payment-required` headers) so facilitators can catalog the endpoint per the bazaar spec: `https://raw.githubusercontent.com/x402-foundation/x402/refs/heads/main/specs/extensions/bazaar.md`
 - **Read APIs:** bearer-scoped to the payer wallet returned by the paid upload flow
