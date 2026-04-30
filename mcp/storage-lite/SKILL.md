@@ -138,6 +138,8 @@ This skill defines a minimal MCP tool contract for calling mnemospark-lite over 
 
 - The upload call is the paid x402 entrypoint.
 - A client may probe without payment, receive `402 Payment Required`, then pay and retry with the same request shape.
+- The `402` JSON body includes `extensions.bazaar` discovery info so facilitators can catalog the endpoint (spec: `https://raw.githubusercontent.com/x402-foundation/x402/refs/heads/main/specs/extensions/bazaar.md`).
+- Best practice: echo the `extensions.bazaar` object into the x402 `PaymentPayload` used for settlement.
 
 ## Constraints (v1)
 
