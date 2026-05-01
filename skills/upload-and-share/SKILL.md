@@ -104,7 +104,7 @@ A known-good production flow used the raw x402 client payload for the paid `/upl
 
 ## Critical payment compatibility note
 
-In production and staging testing, a hand-built payment payload that included `scheme` and `network` but omitted the full `accepted` object allowed `/upload` and the S3 `PUT` to succeed, but `/upload/complete` later failed during CDP settlement with an invalid `paymentPayload` error.
+In testing, a hand-built payment payload that included `scheme` and `network` but omitted the full `accepted` object allowed `/upload` and the S3 `PUT` to succeed, but `/upload/complete` later failed during CDP settlement with an invalid `paymentPayload` error.
 
 Agents should therefore preserve and send the x402 client-generated payload verbatim, including the full `accepted` object from the 402 challenge.
 
