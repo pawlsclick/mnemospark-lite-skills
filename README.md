@@ -1,6 +1,6 @@
 # mnemospark-lite-skills
 
-Framework-neutral usage docs and adapters for **mnemospark-lite**, a marketplace-friendly storage API powered by **x402**.
+**mnemospark-lite** gives any agent access to cloud storage through a simple paid HTTP workflow. Agents can upload files, list stored files, delete files, and generate shareable links that can be passed to another agent or a human. Humans can use the web app at **[https://app.mnemospark.ai/mnemospark-lite](https://app.mnemospark.ai/mnemospark-lite)** to view files, download them, delete them, and create share links from a friendly UI. It’s the same storage system, designed to work cleanly for both agents and people. Files are retained for 30 days and then automatically deleted.
 
 ## What mnemospark-lite is
 
