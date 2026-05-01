@@ -40,9 +40,6 @@ Set:
 
 - `MNEMOSPARK_API_BASE_URL=https://api.mnemospark.ai`
 
-Staging:
-
-- `MNEMOSPARK_API_BASE_URL=https://api-staging.mnemospark.ai`
 
 ## Recommended wallet path: Agentic Wallet
 
