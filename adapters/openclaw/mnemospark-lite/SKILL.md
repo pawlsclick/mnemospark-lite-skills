@@ -3,7 +3,7 @@ name: mnemospark-lite
 description: Use this skill when OpenClaw needs to store files in mnemospark-lite, pay the x402 upload flow, complete uploads, list wallet-scoped uploads, fetch download details, mint share links, or delete uploads. This is the OpenClaw-specific skill for mnemospark-lite HTTP workflows, local wallet/runtime discovery, and reliable x402 payment handling.
 ---
 
-# Mnemospark Lite for OpenClaw
+# mnemospark Lite for OpenClaw
 
 Use this skill to operate mnemospark-lite from OpenClaw.
 
