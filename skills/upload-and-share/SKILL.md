@@ -100,13 +100,20 @@ Do **not**:
 - inject or remove fields unless you are explicitly debugging a backend compatibility problem
 - rebuild a smaller payload by hand when the x402 client already returned the full object
 
-A known-good production flow used the raw x402 client payload for the paid `/upload` request, retried the same paid request on `202 settlement_pending` with the same payment payload, then called `/upload/complete` with only `uploadId` and `completion_token`.
+Use the raw x402 client payload for the paid `/upload` request, retry the same paid request on `202 settlement_pending` with the same payment payload, then call `/upload/complete` with only `uploadId` and `completion_token`.
 
 ## Critical payment compatibility note
 
-In testing, a hand-built payment payload that included `scheme` and `network` but omitted the full `accepted` object allowed `/upload` and the S3 `PUT` to succeed, but `/upload/complete` later failed during CDP settlement with an invalid `paymentPayload` error.
+Preserve and send the x402 client-generated payload verbatim, including the full `accepted` object from the 402 challenge.
 
-Agents should therefore preserve and send the x402 client-generated payload verbatim, including the full `accepted` object from the 402 challenge.
+Ensure the paid upload request uses the full x402 payload shape with:
+- `x402Version`
+- `accepted`
+- `resource`
+- `payload.signature`
+- `payload.authorization`
+
+Do not send a reduced payload that strips `accepted` or replaces the full x402 object with only partial fields such as `scheme` and `network`.
 
 ### Expected x402 v2 payload shape
 
@@ -163,7 +170,7 @@ Some backends may normalize or enrich stored payment fields later during settlem
 - Reuse the exact same `PAYMENT-SIGNATURE` or `x-payment` value while polling.
 - Do **not** regenerate, normalize, or shrink the payment payload between retries.
 - Poll about every 2 seconds.
-- A practical timeout of about 60 seconds worked in testing.
+- Use a timeout of about 60 seconds.
 
 Capture settlement fields from the paid `/upload` response when present:
 
@@ -178,7 +185,7 @@ These fields provide useful audit evidence that the facilitator settlement compl
 - `POST /upload/complete` does **not** need a payment header.
 - Send only `uploadId` and `completion_token`.
 - If the service returns `202`, poll every few seconds until you receive `200` or hit your timeout.
-- A practical timeout of about 45–60 seconds worked in testing.
+- Use a timeout of about 45–60 seconds.
 
 ## Verification behavior
 
