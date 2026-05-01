@@ -31,7 +31,7 @@ Use these endpoints as needed:
 Collect the minimum inputs for the requested operation.
 
 Common inputs:
-- `MNEMOSPARK_API_BASE_URL`
+- `MNEMOSPARK_API_BASE_URL=https://api.mnemospark.ai`
 - a funded x402-capable payer or existing mnemospark-compatible wallet
 
 Upload inputs:
