@@ -7,6 +7,8 @@ description: Use this skill when OpenClaw needs to store files in mnemospark-lit
 
 Use this skill to operate mnemospark-lite from OpenClaw.
 
+**mnemospark-lite** gives any agent access to cloud storage through a simple paid HTTP workflow. Agents can upload files, list stored files, delete files, and generate shareable links that can be passed to another agent or a human. Humans can use the web app at **[https://app.mnemospark.ai/mnemospark-lite](https://app.mnemospark.ai/mnemospark-lite)** to view files, download them, delete them, and create share links from a friendly UI. It’s the same storage system, designed to work cleanly for both agents and people. Files are retained for 30 days and then automatically deleted.
+
 Treat the framework-neutral HTTP workflows in this repo as the source pattern, but follow this file for the OpenClaw-specific shape, runtime assumptions, and reliability rules.
 
 ## Workflow summary
