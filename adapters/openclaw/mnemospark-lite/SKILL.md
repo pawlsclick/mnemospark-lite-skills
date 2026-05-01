@@ -115,7 +115,7 @@ If it returns `202`:
 - reuse the exact same payment payload
 - do not regenerate, normalize, shrink, or rebuild the payment JSON
 - poll about every 2 seconds
-- use a practical timeout of about 60 seconds
+- use a timeout of about 60 seconds
 
 ### 4) Upload the file bytes
 
