@@ -106,12 +106,7 @@ Use the raw x402 client payload for the paid `/upload` request, retry the same p
 
 Preserve and send the x402 client-generated payload verbatim, including the full `accepted` object from the 402 challenge.
 
-Ensure the paid upload request uses the full x402 payload shape with:
-- `x402Version`
-- `accepted`
-- `resource`
-- `payload.signature`
-- `payload.authorization`
+Ensure the paid upload request uses the full x402 payload shape (see the "Expected x402 v2 payload shape" section below).
 
 Do not send a reduced payload that strips `accepted` or replaces the full x402 object with only partial fields such as `scheme` and `network`.
 
