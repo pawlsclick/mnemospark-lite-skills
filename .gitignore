@@ -1,0 +1,14 @@
+.DS_Store
+
+.env
+.env.*
+
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cursor — ignore local state; commit shared rules under .cursor/rules/
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
